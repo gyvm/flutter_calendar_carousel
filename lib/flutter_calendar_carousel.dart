@@ -77,7 +77,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
   final TextStyle? headerTextStyle;
   final String? headerText;
   final TextStyle? weekendTextStyle;
-  final EventList<T>? markedDatesMap;
+  final EventList<List>? markedDatesList;
 
   /// Change `makredDateWidget` when `markedDateShowIcon` is set to false.
   final Widget? markedDateWidget;
@@ -168,7 +168,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
     this.headerTextStyle,
     this.headerText,
     this.weekendTextStyle,
-    this.markedDatesMap,
+    this.markedDatesList,
     this.markedDateShowIcon = false,
     this.markedDateIconBorderColor,
     this.markedDateIconMaxShown = 2,
@@ -466,7 +466,7 @@ class _CalendarState<T extends EventInterface>
     bool isThisMonthDay,
     DateTime now,
   ) {
-    final markedDatesMap = widget.markedDatesMap;
+    final markedDatesList = widget.markedDatesList;
     return Container(
       margin: EdgeInsets.all(widget.dayPadding),
       child: GestureDetector(
@@ -480,8 +480,8 @@ class _CalendarState<T extends EventInterface>
           onPressed: widget.disableDayPressed ? null : () => _onDayPressed(now),
           padding: EdgeInsets.all(widget.dayPadding),
           shape: widget.markedDateCustomShapeBorder != null &&
-                  markedDatesMap != null &&
-                  markedDatesMap.getEvents(now).length > 0
+                  markedDatesList != null &&
+                  markedDatesList.length > 0
               ? widget.markedDateCustomShapeBorder
               : widget.daysHaveCircularBorder == null
                   ? CircleBorder()
@@ -515,7 +515,7 @@ class _CalendarState<T extends EventInterface>
           child: Stack(
             children: widget.showIconBehindDayText
                 ? <Widget>[
-                    widget.markedDatesMap != null
+                    widget.markedDatesList != null
                         ? _renderMarkedMapContainer(now)
                         : Container(),
                     getDayContainer(
@@ -542,7 +542,7 @@ class _CalendarState<T extends EventInterface>
                         isNextMonthDay,
                         isThisMonthDay,
                         now),
-                    widget.markedDatesMap != null
+                    widget.markedDatesList != null
                         ? _renderMarkedMapContainer(now)
                         : Container(),
                   ],
@@ -649,10 +649,10 @@ class _CalendarState<T extends EventInterface>
                   } else {
                     return Container();
                   }
-                  final markedDatesMap = widget.markedDatesMap;
+                  final markedDatesList = widget.markedDatesList;
                   if (widget.markedDateCustomTextStyle != null &&
-                      markedDatesMap != null &&
-                      markedDatesMap.getEvents(now).length > 0) {
+                      markedDatesList != null &&
+                      markedDatesList.length > 0) {
                     textStyle = widget.markedDateCustomTextStyle;
                   }
                   bool isSelectable = true;
@@ -833,7 +833,7 @@ class _CalendarState<T extends EventInterface>
       _selectedDate = picked;
     });
     widget.onDayPressed
-        ?.call(picked, widget.markedDatesMap?.getEvents(picked) ?? const []);
+        ?.call(picked, widget.markedDatesList?.getEvents(picked) ?? const []);
   }
 
   Future<Null> _selectDateFromPicker() async {
@@ -850,7 +850,7 @@ class _CalendarState<T extends EventInterface>
         _selectedDate = selected;
       });
       widget.onDayPressed?.call(
-          selected, widget.markedDatesMap?.getEvents(selected) ?? const []);
+          selected, widget.markedDatesList?.getEvents(selected) ?? const []);
     }
   }
 
@@ -961,7 +961,7 @@ class _CalendarState<T extends EventInterface>
   }
 
   List<Widget> _renderMarkedMap(DateTime now) {
-    final markedEvents = widget.markedDatesMap?.getEvents(now) ?? [];
+    final markedEvents = widget.markedDatesList;
     final markedDateIconBuilder = widget.markedDateIconBuilder;
     final markedDateWidget = widget.markedDateWidget;
     final markedDateMoreShowTotal = widget.markedDateMoreShowTotal;
